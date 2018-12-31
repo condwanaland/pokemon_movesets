@@ -8,7 +8,7 @@ library(tidyr)
 dat <- pdf_text("pokemon_pdf.pdf")
 
 # Source names
-source(pokemon_names.R)
+source("pokemon_names.R")
 
 # Filter for pages that have pokemon
 dat <- dat[49:174]
@@ -142,6 +142,8 @@ rm(diff2)
 rm(long_data)
 rm(moves_dat)
 rm(add_start)
+rm(full_dat)
+rm(dat)
 
 # Lots of areas where cells have been merged together by various characters. 
 # Several where they've been merged on arbitrairy number of spaces. Use the separate command
@@ -182,4 +184,19 @@ base_data <- base_data %>%
   select(-extra)
 
 
-# Basically there
+# Remove some mislabels
+base_data <- base_data %>% 
+  filter(Level != "HM") %>% 
+  filter(Level != "Quick Getaway")
+
+# Relabel bad labels
+base_data$Level <- trimws(base_data$Level)
+
+base_data$Level <- dplyr::recode(base_data$Level,
+                                  `*** Level 17` = "Level 17",
+                                  `*** Level 14` = "Level 14",
+                                  `***Level 14` = "Level 14",
+                                  `***Starting Moves` = "Starting Moves")
+
+
+write.csv(base_data, "moveset_table.csv", row.names = FALSE)
