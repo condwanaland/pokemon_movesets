@@ -1,6 +1,7 @@
 library(shiny)
 library(DT)
 library(dplyr)
+library(tidyr)
 
 dat <- read.csv("moveset_table.csv")
 dat2 <- dat
@@ -32,7 +33,10 @@ ui <- navbarPage(title = "Generate Pokemon", id = "tabber",
       ))),
    
    tabPanel("Output",
-            mainPanel(DTOutput("gen_pokemon"))
+            mainPanel(
+              DTOutput("gen_pokemon"),
+              textOutput("gen_summary"))
+            
    )
 )
 
@@ -55,8 +59,12 @@ server <- function(input, output, session) {
     else {
       plev = input$plevel
     }
-    filter(dat2, pokemon == pval & Level <= plev)
+    return(list(func_call = filter(dat2, pokemon == pval & Level <= plev),
+                val1 = plev,
+                val2 = pval))
+    
   })
+  
   
   observeEvent(input$runbutton, {
     updateTabsetPanel(session, "tabber", selected = "Output")
@@ -68,7 +76,24 @@ server <- function(input, output, session) {
      })
   
   output$gen_pokemon <- renderDT({
-    datatable(dat3())
+    datatable(dat3()$func_call)
+  })
+  
+ 
+  
+  output$gen_summary <- renderPrint({
+    dat_moves <- separate_rows(dat3()$func_call, Moves, sep = ",")
+    movelist <- dat_moves$Moves
+    print(length(movelist))
+    if (length(movelist > 4)){
+      final_movelist <- sample(movelist, 4)
+    }
+    else{
+      final_movelist <- movelist
+    }
+    print(final_movelist)
+    #paste("The pokemon is", dat3()$val2, "at Level", dat3()$val1)
+    #paste(final_movelist)
   })
   
 }
