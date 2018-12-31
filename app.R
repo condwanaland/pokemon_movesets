@@ -17,12 +17,8 @@ dat2$Level <- dplyr::recode(dat2$Level,
 dat2$Level <- as.numeric(as.character(dat2$Level))
 
 # Define UI 
-ui <- fluidPage(
-   
-   # Application title
-   titlePanel("Generate Pokemon"),
-   
-   # Sidebar layout 
+ui <- navbarPage(title = "Generate Pokemon", id = "tabber", 
+   tabPanel("Build",
    sidebarLayout(
       sidebarPanel(
         selectInput("wpokemon", "What Pokemon?", choices = c("Random", levels(dat$pokemon))),
@@ -32,41 +28,64 @@ ui <- fluidPage(
       
       # Show a table 
       mainPanel(
-         DTOutput("movetable"),
-         uiOutput("random_pokemon")
-      )
+         DTOutput("movetable")
+      ))),
+   
+   tabPanel("Output",
+            mainPanel(DTOutput("gen_pokemon"))
    )
 )
 
 # Define server logic 
-server <- function(input, output) {
+server <- function(input, output, session) {
    
   # Calculate table from inputs
-  pval = NULL
-  observeEvent(input$runbutton, {
+  # pval = NULL
+  # observeEvent(input$runbutton, {
+  #   if (input$wpokemon == "Random"){
+  #     pval = sample(dat2$pokemon, size = 1)
+  #   }
+  #   else {
+  #     pval = input$wpokemon
+  #   }
+  #   dat3 <<- dat2 %>%
+  #     filter(pokemon == pval & Level <= input$plevel)
+  #   print(pval)
+  # })
+  
+  dat3 <- reactive({
+    
     if (input$wpokemon == "Random"){
       pval = sample(dat2$pokemon, size = 1)
     }
     else {
       pval = input$wpokemon
     }
-    dat2 <<- dat2 %>% 
-      filter(pokemon == pval & Level <= input$plevel)
+    
+    if (input$plevel == 0){
+      plev = sample(1:20, size = 1)
+    }
+    
+    else {
+      plev = input$plevel
+    }
+    filter(dat2, pokemon == pval & Level <= plev)
+    #print(as.data.frame(pval))
+  })
+  
+  observeEvent(input$runbutton, {
+    updateTabsetPanel(session, "tabber", selected = "Output")
   })
   
   
-  
   output$movetable <- renderDT({
-     
-     input$runbutton
-     
-     if (input$runbutton == 0){
-       datatable(dat, filter = "top")
-     }
-     else{
-       datatable(dat2)
-     }
+       datatable(dat)
      })
+  
+  output$gen_pokemon <- renderDT({
+    datatable(dat3())
+  })
+  
 }
 
 # Run the application 
