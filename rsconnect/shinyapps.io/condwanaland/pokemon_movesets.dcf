@@ -5,6 +5,8 @@ account: condwanaland
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 625084
-bundleId: 1791044
+bundleId: 1791235
 url: https://condwanaland.shinyapps.io/pokemon_movesets/
-when: 1546285142.98119
+when: 1546298483.72009
+asMultiple: FALSE
+asStatic: FALSE
