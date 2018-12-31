@@ -35,7 +35,11 @@ ui <- navbarPage(title = "Generate Pokemon", id = "tabber",
    tabPanel("Output",
             mainPanel(
               DTOutput("gen_pokemon"),
-              textOutput("gen_summary"))
+              br(),
+              br(),
+              br(),
+              textOutput("attr_summary"),
+              textOutput("move_summary"))
             
    )
 )
@@ -81,19 +85,21 @@ server <- function(input, output, session) {
   
  
   
-  output$gen_summary <- renderPrint({
+  output$move_summary <- renderText({
     dat_moves <- separate_rows(dat3()$func_call, Moves, sep = ",")
     movelist <- dat_moves$Moves
-    print(length(movelist))
     if (length(movelist > 4)){
       final_movelist <- sample(movelist, 4)
     }
     else{
       final_movelist <- movelist
     }
-    print(final_movelist)
-    #paste("The pokemon is", dat3()$val2, "at Level", dat3()$val1)
-    #paste(final_movelist)
+    movelist2 <- paste(final_movelist, collapse = ",")
+    paste("It's moveset is ", movelist2)
+  })
+  
+  output$attr_summary <- renderPrint({
+    paste("The pokemon is", dat3()$val2, "at Level", dat3()$val1)
   })
   
 }
