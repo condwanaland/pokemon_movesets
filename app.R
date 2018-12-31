@@ -38,20 +38,6 @@ ui <- navbarPage(title = "Generate Pokemon", id = "tabber",
 
 # Define server logic 
 server <- function(input, output, session) {
-   
-  # Calculate table from inputs
-  # pval = NULL
-  # observeEvent(input$runbutton, {
-  #   if (input$wpokemon == "Random"){
-  #     pval = sample(dat2$pokemon, size = 1)
-  #   }
-  #   else {
-  #     pval = input$wpokemon
-  #   }
-  #   dat3 <<- dat2 %>%
-  #     filter(pokemon == pval & Level <= input$plevel)
-  #   print(pval)
-  # })
   
   dat3 <- reactive({
     
@@ -70,7 +56,6 @@ server <- function(input, output, session) {
       plev = input$plevel
     }
     filter(dat2, pokemon == pval & Level <= plev)
-    #print(as.data.frame(pval))
   })
   
   observeEvent(input$runbutton, {
